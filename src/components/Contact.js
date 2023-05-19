@@ -1,6 +1,69 @@
 import React from "react";
 
 export default function Contact() {
+    const express = require("express");
+const nodemailer = require("nodemailer");
+
+const app = express();
+
+// Configure nodemailer to use your email service
+const transporter = nodemailer.createTransport({
+  service: "lucasleung2593@gmail.com",
+  auth: {
+    user: "lucasleung2593@gmail.com",
+    pass: process.env.pass
+  }
+});
+
+// Handle the form submission
+app.post("/send-email", (req, res) => {
+  const { name, email, subject, message } = req.body;
+
+  // Compose the email
+  const mailOptions = {
+    from: email,
+    to: "lucasleung2593@gmail.com",
+    subject: subject,
+    text: `Name: ${name}\nEmail: ${email}\n\n${message}`
+  };
+
+  // Send the email
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      // Handle the error
+      res.status(500).json({ error: "An error occurred while sending the email." });
+    } else {
+      // Email sent successfully
+      res.json({ success: "Email sent successfully." });
+    }
+  });
+});
+
+// Start the server
+app.listen(3000, () => {
+  console.log("Server started on port 3000");
+});
+
+
+    document.getElementById("contactForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+      
+        // Collect form data
+        const formData = new FormData(this);
+      
+        // Send form data to the server
+        fetch("/send-email", {
+          method: "POST",
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Handle the server response (e.g., show success message, display errors)
+        })
+        .catch(error => {
+          // Handle any errors that occurred during the request
+        });
+      });
   return (
     <section id="contact" className="relative">
       <div className="container px-5 py-10 mx-auto flex sm:flex-nowrap flex-wrap">
@@ -43,7 +106,8 @@ export default function Contact() {
         <form
           netlify
           name="contact"
-          className="lg:w-1/3 md:w-1/2 flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0">
+          className="lg:w-1/3 md:w-1/2 flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0"
+          id="contactForm">
           <h2 className="text-white sm:text-4xl text-3xl mb-1 font-medium title-font">
             Hire Me
           </h2>
